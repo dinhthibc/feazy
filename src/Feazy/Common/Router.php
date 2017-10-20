@@ -28,9 +28,11 @@ class Router {
 		if ($is_match && is_callable($callback)) {
 			if (is_array($callback)) {
 				$obj = new $callback[0]();
-				$obj->$callback[1](...array_slice($matches, 1));
+				//$obj->$callback[1](...array_slice($matches, 1));
+				call_user_func_array(array($obj, $callback[1]), array_slice($matches, 1));
 			} else {
-				$callback(...array_slice($matches, 1));
+				//$callback(...array_slice($matches, 1));
+				call_user_func_array($callback, array_slice($matches, 1));
 			}
 			exit;
 		}
