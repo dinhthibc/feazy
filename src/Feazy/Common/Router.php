@@ -6,7 +6,6 @@ class Router {
 
 	private $route = '';
 	private $ns = '';
-	private $basicRouting = true;
 
 	public function __construct($route = '/') {
 		$this->route = trim($route, '/');
@@ -27,16 +26,18 @@ class Router {
 		$regex = str_replace('/', '\/', $regex);
 		$is_match = preg_match('/^' . ($regex) . '$/', $this->route, $matches);
 		if ($is_match && is_callable($callback)) {
-			if (is_array($callback)) {
-				$obj = new $callback[0]();
-				//$obj->$callback[1](...array_slice($matches, 1));
-				call_user_func_array(array($obj, $callback[1]), array_slice($matches, 1));
-			} else {
-				//$callback(...array_slice($matches, 1));
-				call_user_func_array($callback, array_slice($matches, 1));
-			}
-			exit;
+			$this->execute($callback, array_slice($matches, 1));
 		}
+	}
+
+	private function execute($callback, $parameters = array()) {
+		if (is_array($callback)) {
+			$obj = new $callback[0]();
+			call_user_func_array(array($obj, $callback[1]), $parameters);
+		} else {
+			call_user_func_array($callback, $parameters);
+		}
+		exit;
 	}
 
 	public function setPrefix($prefix) {
@@ -74,17 +75,41 @@ class Router {
 		$this->dispatch($regex, $callback, 'delete');
 	}
 
-	public function run() {
-		if ($this->basicRouting) {
-			$this->basicRoute();
+	public function basicRoute() {
+		$route = str_replace(trim($this->ns, '/'), '', $this->route);
+		$route = trim($route, '/');
+		$routePaths = explode('/', $route);
+
+		$controllerName = 'Index';
+		if (isset($routePaths[0]) && $routePaths[0] != '') {
+			$controllerName = ucfirst($routePaths[0]);
+		}
+
+		$controller = $this->prefix . $controllerName . 'Controller';
+		$method = 'index';
+		$paramStartIndex = 1;
+		if (isset($routePaths[1])) {
+			if (is_callable(array($controller, $routePaths[1]))) {
+				$method = $routePaths[1];
+				$paramStartIndex = 2;
+			}
+		}
+
+		$parameters = array_slice($routePaths, $paramStartIndex);
+		$callback = array(
+			$controller, $method
+		);
+		if (is_callable($callback)) {
+			$this->execute($callback, $parameters);
 		}
 	}
 
-	public function disableBasicRouting() {
-		$this->basicRouting = false;
-	}
+	public function notFound($callback) {
+		if (!is_callable($callback)) {
+			$callback = explode('@', $callback);
+			$callback[0] = $this->prefix . $callback[0];
+		}
 
-	private function basicRoute() {
-		
+		$this->execute($callback);
 	}
 }
