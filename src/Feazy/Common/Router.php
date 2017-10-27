@@ -2,7 +2,7 @@
 namespace Feazy\Common;
 
 class Router {
-	private $prefix = 'Controller\\';
+	private $prefix = 'Application\\Controller\\';
 
 	private $route = '';
 	private $ns = '';
