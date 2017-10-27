@@ -6,6 +6,7 @@ class Router {
 
 	private $route = '';
 	private $ns = '';
+	private $basicRouting = true;
 
 	public function __construct($route = '/') {
 		$this->route = trim($route, '/');
@@ -71,5 +72,19 @@ class Router {
 
 	public function delete($regex, $callback) {
 		$this->dispatch($regex, $callback, 'delete');
+	}
+
+	public function run() {
+		if ($this->basicRouting) {
+			$this->basicRoute();
+		}
+	}
+
+	public function disableBasicRouting() {
+		$this->basicRouting = false;
+	}
+
+	private function basicRoute() {
+		
 	}
 }
