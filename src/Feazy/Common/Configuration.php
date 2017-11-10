@@ -3,35 +3,27 @@ namespace Feazy\Common;
 
 class Configuration
 {
-	private static $filename = 'feazy.ini';
-	private static $configs = false;
-	const ENV_KEY = 'env';
+	private $filename = 'feazy.ini';
+	private $configs = false;
 
-	private static function parseFile() {
-		if (!self::$configs) {
-			self::$configs = parse_ini_file(self::$filename, true);
+	public function __construct($filename) {
+		$this->filename = $filename;
+		if (file_exists($filename)) {
+			$this->configs = parse_ini_file($filename, true);
 		}
 	}
 
-	public static function setIniFilename($filename) {
-		self::$filename	= $filename;
-	}
-
-	public static function get($name) {
-		self::parseFile();
-
-		if (isset(self::$configs[self::$configs[self::ENV_KEY]][$name])) {
-			return self::$configs[self::$configs[self::ENV_KEY]][$name];
+	public function get($name) {
+		if (isset($this->configs[$name])) {
+			return $this->configs[$name];
 		}
 
 		return null;
 	}
 
-	public static function getAll() {
-		self::parseFile();
-
-		if (isset(self::$configs[self::$configs[self::ENV_KEY]])) {
-			return self::$configs[self::$configs[self::ENV_KEY]];
+	public function getAll() {
+		if (isset($this->configs)) {
+			return $this->configs;
 		}
 
 		return array();

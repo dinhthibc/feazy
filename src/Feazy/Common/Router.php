@@ -44,6 +44,19 @@ class Router {
 		$this->prefix = $prefix;
 	}
 
+	public function matchPrefix($prefix, callable $callback)
+	{
+		$prefix = trim($prefix, '/');
+		$route = $this->route;
+		if (strpos($route, ltrim($prefix, "/")) === 0) {
+			$route = str_replace($prefix, '', $route);
+			$this->route = trim($route, '/');
+			call_user_func_array($callback, array());
+			return true;
+		}
+		return false;
+	}
+
 	public function group($ns, callable $callback) {
 		if (is_callable($callback)) {
 			$ns = $this->ns . $ns;

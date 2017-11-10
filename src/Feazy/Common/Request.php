@@ -2,16 +2,12 @@
 namespace Feazy\Common;
 
 class Request {
-	private static $instance = null;
 	private $url = '';
 	private $params = array();
 	private $requestBodyParams = false;
 	private $posts = array();
 	private $parameters = array();
-	private function __construct() {
-	}
-
-	public function init($url = ''){
+	public function __construct($url = '') {
 		$this->url = $url;
 		$this->params   = explode('/', $url);
 		if (isset($_POST)) {
@@ -21,16 +17,6 @@ class Request {
 		if (isset($_GET)) {
 			$this->parameters = $_GET;
 		}
-	}
-
-	/**
-	 * @return Request
-	 */
-	public static function getInstance(){
-		if (Request::$instance == null){
-			Request::$instance = new Request();
-		}
-		return Request::$instance;
 	}
 
 	public function setPosts($posts) {

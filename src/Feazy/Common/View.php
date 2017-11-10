@@ -1,6 +1,11 @@
 <?php
 namespace Feazy\Common;
 
+/**
+ * Class View
+ * @package Feazy\Common
+ * @property Configuration config
+ */
 class View {
 	protected $title = '';
 	protected $layout = 'layout';
@@ -10,34 +15,30 @@ class View {
 	protected $script = array();
 	protected $style = array();
 
-	private static $instance = null;
-	public static function getInstance(){
-		if (self::$instance == null){
-			self::$instance = new View();
+	public function __construct($template) {
+		$this->template = $template;
+		//append DI component
+		$components = DIManager::getComponents();
+		foreach ($components as $key => $component) {
+			$this->{$key} = $component;
 		}
-		return self::$instance;
-	}
-
-	private function __construct() {
-		$this->title = Configuration::get('sitename');
-		$this->template = Configuration::get('template') . '/';
 	}
 
 	public function render($name, $data = array(), $single = false) {
 		if (!$single){
 			foreach ($this->headerScript as $value){
-				$this->script[] = '<script src="' . $this->getTemplateURL() . $value . '"></script>';
+				$this->script[] = '<script src="' . $this->template . DIRECTORY_SEPARATOR  . $value . '"></script>';
 			}
 			foreach ($this->headerStyle as $value){
-				$this->style[] = '<link rel="stylesheet" type="text/css" href="' . $this->getTemplateURL() . $value . '" />';
+				$this->style[] = '<link rel="stylesheet" type="text/css" href="' . $this->template . DIRECTORY_SEPARATOR  . $value . '" />';
 			}
 
 			extract($data, EXTR_OVERWRITE);
 
-			$this->content = $this->template . $name . '.phtml';
-			include($this->template . 'layout/' . $this->layout . '.phtml');
+			$this->content = $this->template . DIRECTORY_SEPARATOR . $name . '.phtml';
+			include(sprintf('%s/layout/%s.phtml', $this->template, $this->layout));
 		} else{
-			include($this->template . $name . '.phtml');
+			include($this->template . DIRECTORY_SEPARATOR . $name . '.phtml');
 		}
 	}
 
@@ -45,7 +46,7 @@ class View {
 		if ($replace){
 			$this->title = $title;
 		} else{
-			$this->title = sprintf('%s - %s', $title, $this->title);
+			$this->title = sprintf('%s | %s', $title, $this->title);
 		}
 	}
 
@@ -53,7 +54,10 @@ class View {
 		$this->layout = $layoutName;
 	}
 
-	public function getTemplateURL(){
+	public function getTemplateURL() {
+		if (isset($this->config) && $this->config->get('base_url')) {
+			return $this->config->get('base_url') . $this->template;
+		}
 		return $this->template;
 	}
 
