@@ -7,16 +7,16 @@
  */
 
 namespace Feazy\Controller;
-use Feazy\Common\View;
+
+use Feazy\Common\DIManager;
 
 class Controller
 {
-	/***
-	 * @var View
-	 */
-	protected $view;
-	public function __contruct() {
-		$this->view = View::getInstance();
+	public function __construct() {
+		$components = DIManager::getComponents();
+		foreach ($components as $key => $component) {
+			$this->{$key} = $component;
+		}
 	}
 
 	public function toJSON($data) {
