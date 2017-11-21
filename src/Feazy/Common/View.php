@@ -36,6 +36,14 @@ class View {
 			extract($data, EXTR_OVERWRITE);
 
 			$this->content = $this->template . DIRECTORY_SEPARATOR . $name . '.phtml';
+
+			$scriptFile = $this->template . DIRECTORY_SEPARATOR . $name . '.js';
+			if (file_exists($scriptFile)) {
+				$this->scriptFile = $scriptFile;
+			} else {
+				$this->scriptFile = false;
+			}
+			
 			include(sprintf('%s/layout/%s.phtml', $this->template, $this->layout));
 		} else{
 			include($this->template . DIRECTORY_SEPARATOR . $name . '.phtml');
