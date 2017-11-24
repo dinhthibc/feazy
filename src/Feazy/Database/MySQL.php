@@ -36,13 +36,11 @@ class MySQL
 
 	public function connect()
 	{
-		try {
-			$this->DB = new PDOConnectionManager('mysql:host='. $this->config->get('db_host') .';dbname='. $this->config->get('db_name'), $this->config->get('db_user'), $this->config->get('db_password'), array(\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8', \PDO::ATTR_PERSISTENT => true));
-			if ($this->config->get('slave_host')) {
-				$this->Slave = new PDOConnectionManager('mysql:host='. $this->config->get('slave_host') .';dbname='. $this->config->get('slave_name'), $this->config->get('slave_user'), $this->config->get('slave_password'), array(\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8', \PDO::ATTR_PERSISTENT => true));
-			}
-		} catch (\PDOException $e) {
-
+		$this->DB = new PDOConnectionManager('mysql:host='. $this->config->get('db_host') .';dbname='. $this->config->get('db_name'), $this->config->get('db_user'), $this->config->get('db_password'), array(\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8', \PDO::ATTR_PERSISTENT => true));
+		if ($this->config->get('slave_host')) {
+			$this->Slave = new PDOConnectionManager('mysql:host='. $this->config->get('slave_host') .';dbname='. $this->config->get('slave_name'), $this->config->get('slave_user'), $this->config->get('slave_password'), array(\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8', \PDO::ATTR_PERSISTENT => true));
+		} else {
+			$this->Slave = $this->DB;
 		}
 	}
 
