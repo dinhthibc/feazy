@@ -14,9 +14,8 @@ class Request {
 			$this->posts = $_POST;
 		}
 
-		if (isset($_GET)) {
-			$this->parameters = $_GET;
-		}
+		parse_str($_SERVER['QUERY_STRING'], $urlParams);
+		$this->parameters = $urlParams;
 	}
 
 	public function setPosts($posts) {
