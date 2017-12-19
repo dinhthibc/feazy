@@ -14,7 +14,8 @@ class Request {
 			$this->posts = $_POST;
 		}
 
-		parse_str($_SERVER['QUERY_STRING'], $urlParams);
+		$tmp = explode('?', $_SERVER['QUERY_STRING']);
+		parse_str($tmp[count($tmp) - 1], $urlParams); //use the last question mark as delimiter
 		$this->parameters = $urlParams;
 	}
 
