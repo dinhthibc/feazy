@@ -36,9 +36,14 @@ class MySQL
 
 	public function connect()
 	{
-		$this->DB = new PDOConnectionManager('mysql:host='. $this->config->get('db_host') .';dbname='. $this->config->get('db_name'), $this->config->get('db_user'), $this->config->get('db_password'), array(\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8', \PDO::ATTR_PERSISTENT => true));
+		$initCommands = $this->config->get('db_init_command');
+		if ($initCommands === null) {
+			$initCommands = "SET time_zone='+00:00', NAMES utf8";
+		}
+
+		$this->DB = new PDOConnectionManager('mysql:host='. $this->config->get('db_host') .';dbname='. $this->config->get('db_name'), $this->config->get('db_user'), $this->config->get('db_password'), array(\PDO::MYSQL_ATTR_INIT_COMMAND => $initCommands, \PDO::ATTR_PERSISTENT => true));
 		if ($this->config->get('slave_host')) {
-			$this->Slave = new PDOConnectionManager('mysql:host='. $this->config->get('slave_host') .';dbname='. $this->config->get('slave_name'), $this->config->get('slave_user'), $this->config->get('slave_password'), array(\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8', \PDO::ATTR_PERSISTENT => true));
+			$this->Slave = new PDOConnectionManager('mysql:host='. $this->config->get('slave_host') .';dbname='. $this->config->get('slave_name'), $this->config->get('slave_user'), $this->config->get('slave_password'), array(\PDO::MYSQL_ATTR_INIT_COMMAND => $initCommands, \PDO::ATTR_PERSISTENT => true));
 		} else {
 			$this->Slave = $this->DB;
 		}
