@@ -14,6 +14,7 @@ class View {
 	protected $headerStyle  = array();
 	protected $script = array();
 	protected $style = array();
+	protected $data = array();
 
 	public function __construct($template) {
 		$this->template = $template;
@@ -24,7 +25,25 @@ class View {
 		}
 	}
 
+	public function addSection($section, $variables = array()) {
+		$data = array();
+		foreach ($variables as $variable) {
+			if (isset($this->data[$variable])) {
+				$data[$variable] = $this->data[$variable];
+			}
+		}
+		extract($data, EXTR_OVERWRITE);
+
+		$filename = $this->template . DIRECTORY_SEPARATOR . $section . '.phtml';
+		if (file_exists($filename)) {
+			require_once $filename;
+		}
+	}
+
 	public function render($name, $data = array(), $single = false) {
+		$this->data = $data;
+		extract($data, EXTR_OVERWRITE);
+
 		if (!$single){
 			foreach ($this->headerScript as $value){
 				$this->script[] = '<script src="' . $this->template . DIRECTORY_SEPARATOR  . $value . '"></script>';
@@ -32,8 +51,6 @@ class View {
 			foreach ($this->headerStyle as $value){
 				$this->style[] = '<link rel="stylesheet" type="text/css" href="' . $this->template . DIRECTORY_SEPARATOR  . $value . '" />';
 			}
-
-			extract($data, EXTR_OVERWRITE);
 
 			$this->content = $this->template . DIRECTORY_SEPARATOR . $name . '.phtml';
 
