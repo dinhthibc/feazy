@@ -31,9 +31,14 @@ class Controller
 	}
 
 	public function error($message, $code = '') {
+		http_response_code(400);
 		$this->toJSON(array(
 			'error_message' => $message,
 			'error_code' => $code
 		));
+	}
+
+	protected function redirect($uri) {
+		header('Location: ' . $uri);
 	}
 }
